@@ -21,16 +21,17 @@ namespace WPF.ViewModels
         IProcessInfoService service;
 
         public ObservableCollection<ProcessInfo> ProcessInfos { get; } = new ObservableCollection<ProcessInfo>();
-        public StatusInfo Initialize()
+        public async Task Initialize()
         {
-            return new StatusInfo(0, 100);
+            var info = new StatusInfo(0, 100);
+            var r = this.UpdateAsync(info, new CancellationToken());
         }
         public async Task<bool> UpdateAsync(StatusInfo info, CancellationToken token) // return remain time information
         {
             int len = 100;
             info.StatusMax = len;
 
-            var tempData = await Task.Run(async () => await GetData(info, token));
+            var tempData = await Task.Run(() => GetData(info, token));
 
             if (token.IsCancellationRequested) {
                 return false;
@@ -55,20 +56,18 @@ namespace WPF.ViewModels
 
             return true;
         }
-        private async Task<List<ProcessInfo>> GetData(StatusInfo si, CancellationToken token)
+        private List<ProcessInfo> GetData(StatusInfo si, CancellationToken token)
         {
             var data = new List<ProcessInfo>();
             foreach (var p in service.GetProcessInfos().Where(x => !String.IsNullOrEmpty(x.FullName)))
             {
                 if (token.IsCancellationRequested)
                 {
-                    return await Task.FromResult(data);
-                    //There is no return Task.CompletedTask 
+                    break;
                 }
 
                 data.Add(p);
                 si.CurrentStatus++;
-                await Task.Delay(10);
             }
             return data;
         }
@@ -78,7 +77,7 @@ namespace WPF.ViewModels
     public interface IProcessInfoViewModel
     {
         ObservableCollection<ProcessInfo> ProcessInfos { get; }
-        StatusInfo Initialize();
+        Task Initialize();
         Task<bool> UpdateAsync(StatusInfo info, CancellationToken token);
     }
 }

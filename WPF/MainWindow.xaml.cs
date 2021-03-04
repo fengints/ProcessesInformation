@@ -36,15 +36,19 @@ namespace WPF
         {
             InitializeComponent();
             service = new ProcessInfoViewModel();
-            service.Initialize();
         }
 
         private bool updateStarted;
         private CancellationTokenSource updateCtokenS;
+
+
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
-
+            await UpdateButton(button);
+        }
+        private async Task UpdateButton(Button button)
+        {
             if (!updateStarted)
             {
                 updateStarted = true;
@@ -56,14 +60,14 @@ namespace WPF
                 // Update code
                 var statusInfo = new StatusInfo();
                 var updating = service.UpdateAsync(statusInfo, ctoken);
-                
+
                 //Send statusinfo to progressbar
                 try
                 {
                     await HandleProgressBar(UpdateProgress, statusInfo, ctoken);
                 }
                 finally
-                { 
+                {
                     updateStarted = false;
                     SetButtonContent(button, "Обновить");
                 }
@@ -80,7 +84,6 @@ namespace WPF
                 button.IsEnabled = true;
             }
         }
-
         private async Task HandleProgressBar(ProgressBar bar, StatusInfo si, CancellationToken token)
         {
             try
@@ -103,6 +106,12 @@ namespace WPF
         private void SetButtonContent(Button button, string content)
         {
             button.Content = content;
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            //initialze view
+            await UpdateButton(this.update_button);
         }
     }
 
