@@ -25,12 +25,16 @@ namespace WPF.ViewModels
         {
             return new StatusInfo(0, 100);
         }
-        public async Task UpdateAsync(StatusInfo info, CancellationToken token) // return remain time information
+        public async Task<bool> UpdateAsync(StatusInfo info, CancellationToken token) // return remain time information
         {
             int len = 100;
             info.StatusMax = len;
 
             var tempData = await Task.Run(async () => await GetData(info, token));
+
+            if (token.IsCancellationRequested) {
+                return false;
+            }
 
             info.CurrentStatus = len;
 
@@ -48,6 +52,8 @@ namespace WPF.ViewModels
             {
                 ProcessInfos.Add(element);
             }
+
+            return true;
         }
         private async Task<List<ProcessInfo>> GetData(StatusInfo si, CancellationToken token)
         {
@@ -73,6 +79,6 @@ namespace WPF.ViewModels
     {
         ObservableCollection<ProcessInfo> ProcessInfos { get; }
         StatusInfo Initialize();
-        Task UpdateAsync(StatusInfo info, CancellationToken token);
+        Task<bool> UpdateAsync(StatusInfo info, CancellationToken token);
     }
 }
