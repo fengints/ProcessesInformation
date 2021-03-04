@@ -97,6 +97,7 @@
     </ApplicationDefinition>
     <Compile Include="Tools\MyImageConverter.cs" />
     <Compile Include="Tools\ProcessComparer.cs" />
+    <Compile Include="Tools\StatusInfo.cs" />
     <Compile Include="ViewModels\ProcessInfoViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
