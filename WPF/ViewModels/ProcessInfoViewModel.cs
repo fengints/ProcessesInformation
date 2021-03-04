@@ -40,6 +40,7 @@ namespace WPF.ViewModels
             info.CurrentStatus = len;
 
             var comparer = new ProcessComparer();
+
             //Delete old elements
             var old = ProcessInfos.Except(tempData, comparer).ToList();
             foreach (var d in old)
@@ -59,7 +60,8 @@ namespace WPF.ViewModels
         private List<ProcessInfo> GetData(StatusInfo si, CancellationToken token)
         {
             var data = new List<ProcessInfo>();
-            foreach (var p in service.GetProcessInfos().Where(x => !String.IsNullOrEmpty(x.FullName)))
+
+            foreach (var p in service.GetProcessInfos())
             {
                 if (token.IsCancellationRequested)
                 {

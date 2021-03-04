@@ -236,9 +236,10 @@ namespace GetProcesses.PI
         }
 
         // returns ProviderUnknown for some reason
+
+        private const string WINTRUST_ACTION_GENERIC_VERIFY_V2 = "{00AAC56B-CD44-11d0-8CC2-00C04FC295EE}";
         public bool SignatureExist(string fileName)
         {
-            string WINTRUST_ACTION_GENERIC_VERIFY_V2 = Guid.NewGuid().ToString();
             WinTrustFileInfo wtfi = new WinTrustFileInfo(fileName);
             WinTrustData wtd = new WinTrustData(wtfi);
             Guid guidAction = new Guid(WINTRUST_ACTION_GENERIC_VERIFY_V2);
@@ -287,10 +288,6 @@ namespace GetProcesses.PI
             UInt32 bytesCopied;
 
             bool success = Win32Api.EnumProcesses(processIds, arrayBytesSize, out bytesCopied);
-            Console.WriteLine(success);
-            Console.WriteLine("Process count: " + processIds.Where(x => x != 0).Count());
-
-
             return processIds;
         }
         static string PrintProcessName(int processID)

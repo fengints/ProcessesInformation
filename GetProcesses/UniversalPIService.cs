@@ -40,11 +40,13 @@ namespace GetProcesses
                         //icon = proc.ProcessIcon(),
                         Id = pId,
                         IsElevated = proc.IsElevated(),
-                        //Sign = proc.SignatureExist(),
                     };
 
                     //Set name
                     model.Name = System.IO.Path.GetFileName(model.FullName);
+
+                    //digital sign
+                    model.Sign = proc.SignatureExist(model.FullName);
 
                     //Wmi methods
                     model.CMDString = wmiPI.GetProcessCommandLine();
