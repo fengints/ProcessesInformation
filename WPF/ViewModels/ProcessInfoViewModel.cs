@@ -24,7 +24,7 @@ namespace WPF.ViewModels
         public async Task Initialize()
         {
             var info = new StatusInfo(0, 100);
-            var r = this.UpdateAsync(info, new CancellationToken());
+            var r = await this.UpdateAsync(info, new CancellationToken());
         }
         public async Task<bool> UpdateAsync(StatusInfo info, CancellationToken token) // return remain time information
         {

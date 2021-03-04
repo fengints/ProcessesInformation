@@ -292,22 +292,9 @@ namespace GetProcesses.PI
 
 
             return processIds;
-
-            //add to list
-            var procesIds = new List<Tuple<int, string>>();
-            for (int i = 0; i < processIds.Length; i++)
-            {
-                if (processIds[i] != 0)
-                {
-                    procesIds.Add(new Tuple<int, string>(processIds[i], " basename: " + PrintProcessName(processIds[i])));
-                }
-            }
-
         }
         static string PrintProcessName(int processID)
         {
-            string sName = "";
-            bool bFound = false;
             //First approach
             using (var hProcess = Win32Api.OpenProcess(ProcessAccessFlags.QueryInformation | ProcessAccessFlags.VMRead, false, processID))
             {

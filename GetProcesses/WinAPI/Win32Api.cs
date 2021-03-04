@@ -11,173 +11,6 @@ using System.Threading.Tasks;
 
 namespace GetProcesses.WinAPI
 {
-
-    #region delete
-
-    [Flags]
-    enum StrongNameInFlags : int
-    {
-        /// <summary>verify even if the settings in the registry disable it</summary>
-        ForceVerification = 0x00000001,
-
-        /// <summary>verification is the first (on entry to the cache)</summary>
-        Install = 0x00000002,
-
-        /// <summary>cache protects assembly from all but admin access</summary>
-        AdminAccess = 0x00000004,
-
-        /// <summary>cache protects user's assembly from other users</summary>
-        UserAccess = 0x00000008,
-
-        /// <summary>cache provides no access restriction guarantees</summary>
-        AllAccess = 0x00000010
-    }
-    [Flags]
-    enum StrongNameOutFlags : int
-    {
-        /// <summary>set to false if verify succeeded due to registry settings</summary>
-        WasVerified = 0x00000001
-    }
-    [StructLayout(LayoutKind.Sequential)]
-    public struct IMAGE_DATA_DIRECTORY
-    {
-        public uint VirtualAddress;
-        public uint Size;
-    }
-    public enum MachineType : UInt16
-    {
-        // x86
-        IMAGE_FILE_MACHINE_I386 = 0x014c,
-
-        // Intel Itanium
-        IMAGE_FILE_MACHINE_IA64 = 0x0200,
-
-        // x64
-        IMAGE_FILE_MACHINE_AMD64 = 0x8664,
-    }
-    public enum SIGNATURE_STATE
-    {
-        /// SIGNATURE_STATE_UNSIGNED_MISSING -> 0
-        SIGNATURE_STATE_UNSIGNED_MISSING = 0,
-
-        SIGNATURE_STATE_UNSIGNED_UNSUPPORTED,
-
-        SIGNATURE_STATE_UNSIGNED_POLICY,
-
-        SIGNATURE_STATE_INVALID_CORRUPT,
-
-        SIGNATURE_STATE_INVALID_POLICY,
-
-        SIGNATURE_STATE_VALID,
-
-        SIGNATURE_STATE_TRUSTED,
-
-        SIGNATURE_STATE_UNTRUSTED,
-    }
-
-    public enum SIGNATURE_INFO_FLAGS
-    {
-        /// SIF_NONE -> 0x0000
-        SIF_NONE = 0,
-
-        /// SIF_AUTHENTICODE_SIGNED -> 0x0001
-        SIF_AUTHENTICODE_SIGNED = 1,
-
-        /// SIF_CATALOG_SIGNED -> 0x0002
-        SIF_CATALOG_SIGNED = 2,
-
-        /// SIF_VERSION_INFO -> 0x0004
-        SIF_VERSION_INFO = 4,
-
-        /// SIF_CHECK_OS_BINARY -> 0x0800
-        SIF_CHECK_OS_BINARY = 2048,
-
-        /// SIF_BASE_VERIFICATION -> 0x1000
-        SIF_BASE_VERIFICATION = 4096,
-
-        /// SIF_CATALOG_FIRST -> 0x2000
-        SIF_CATALOG_FIRST = 8192,
-
-        /// SIF_MOTW -> 0x4000
-        SIF_MOTW = 16384,
-    }
-
-    public enum SIGNATURE_INFO_AVAILABILITY
-    {
-        /// SIA_DISPLAYNAME -> 0x0001
-        SIA_DISPLAYNAME = 1,
-
-        /// SIA_PUBLISHERNAME -> 0x0002
-        SIA_PUBLISHERNAME = 2,
-
-        /// SIA_MOREINFOURL -> 0x0004
-        SIA_MOREINFOURL = 4,
-
-        /// SIA_HASH -> 0x0008
-        SIA_HASH = 8,
-    }
-
-    public enum SIGNATURE_INFO_TYPE
-    {
-        /// SIT_UNKNOWN -> 0
-        SIT_UNKNOWN = 0,
-
-        SIT_AUTHENTICODE,
-
-        SIT_CATALOG,
-    }
-
-
-    [StructLayoutAttribute(LayoutKind.Sequential)]
-    public struct SIGNATURE_INFO
-    {
-        /// DWORD->unsigned int
-        public uint cbSize;
-
-        /// SIGNATURE_STATE->Anonymous_7e0526d8_af30_47f9_9233_a77658d0f1e5
-        public SIGNATURE_STATE nSignatureState;
-
-        /// SIGNATURE_INFO_TYPE->Anonymous_27075e4b_faa5_4e57_ada0_6d49fae74187
-        internal SIGNATURE_INFO_TYPE nSignatureType;
-
-        /// DWORD->unsigned int
-        internal uint dwSignatureInfoAvailability;
-
-        /// DWORD->unsigned int
-        internal uint dwInfoAvailability;
-
-        /// PWSTR->WCHAR*
-        [MarshalAsAttribute(UnmanagedType.LPWStr)]
-        internal string pszDisplayName;
-
-        /// DWORD->unsigned int
-        internal uint cchDisplayName;
-
-        /// PWSTR->WCHAR*
-        [MarshalAsAttribute(UnmanagedType.LPWStr)]
-        internal string pszPublisherName;
-
-        /// DWORD->unsigned int
-        internal uint cchPublisherName;
-
-        /// PWSTR->WCHAR*
-        [MarshalAsAttribute(UnmanagedType.LPWStr)]
-        internal string pszMoreInfoURL;
-
-        /// DWORD->unsigned int
-        internal uint cchMoreInfoURL;
-
-        /// LPBYTE->BYTE*
-        internal System.IntPtr prgbHash;
-
-        /// DWORD->unsigned int
-        internal uint cbHash;
-
-        /// BOOL->int
-        internal int fOSBinary;
-    }
-    #endregion
-
     #region ProcessBitness
     [StructLayout(LayoutKind.Sequential)]
     public struct SYSTEM_INFO
@@ -214,9 +47,6 @@ namespace GetProcesses.WinAPI
 
     public class Win32Api
     {
-        [DllImport("mscorsn.dll")]
-        static extern bool StrongNameSignatureVerificationFromImage(byte[] pbBase, int dwLength, StrongNameInFlags dwInFlags, [Out] out StrongNameOutFlags pdwOutFlags);
-
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool QueryFullProcessImageName([In] MySafeHandle hProcess, [In] int dwFlags, [Out] StringBuilder lpExeName, ref int lpdwSize);
 
@@ -333,15 +163,6 @@ namespace GetProcesses.WinAPI
             [In] IntPtr hwnd,
             [In][MarshalAs(UnmanagedType.LPStruct)] Guid pgActionID,
             [In] WinTrustData pWVTData);
-
-        #region delete
-        [DllImport("wintrust.dll", EntryPoint = "WTGetSignatureInfo", CallingConvention = CallingConvention.StdCall)]
-        public static extern int WTGetSignatureInfo(
-            [In][MarshalAs(UnmanagedType.LPWStr)] string pszFile,
-            [In] IntPtr hFile,
-            SIGNATURE_INFO_FLAGS sigInfoFlags, ref SIGNATURE_INFO psiginfo, ref IntPtr ppCertContext, ref IntPtr phWVTStateData);
-
-        #endregion
     }
 
 
